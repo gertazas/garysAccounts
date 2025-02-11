@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import WorkDay, TrailerSelection
 
-# Register your models here.
+admin.site.register(WorkDay)
+admin.site.register(TrailerSelection)

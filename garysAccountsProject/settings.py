@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+# import django_heroku
+# import cloudinary
+# import cloudinary.uploader
+# import cloudinary.api
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +30,11 @@ SECRET_KEY = 'django-insecure-k%ly!lnny(fmia=_d6z@vr2n_d!s)1y=#@&+jg99rnydwd+tu7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['8013-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io']
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://8013-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io",
+]
 
 
 # Application definition
@@ -55,7 +64,7 @@ ROOT_URLCONF = 'garysAccountsProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'garysAccApp' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -118,7 +127,24 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+# If you also want to serve static files in development, add:
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "garysAccApp", "static"),
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# cloudinary.config(
+#     cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+#     api_key=os.getenv("CLOUDINARY_API_KEY"),
+#     api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+# )
+
+# # Activate Django-Heroku
+# django_heroku.settings(locals())
