@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Step 3 - Summary{% endblock %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <table>
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Coffee %</th>
+                <th>Milkshake %</th>
+                <th>Trailers</th>
+                <th>Trailers with Coffee</th>
+                <th>Bank Holiday?</th>
+                <th>Has Coffee Machine?</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if days %}
+                {% for day in days %}
+                <tr>
+                    <td>{{ day.day }}</td>
+                    <td><input type="number" name="coffee_{{ day.id }}" value="{{ day.coffee_percentage }}" step="0.1" min="0" max="100"></td>
+                    <td><input type="number" name="milkshake_{{ day.id }}" value="{{ day.milkshake_percentage }}" step="0.1" min="0" max="100"></td>
+                    <td><input type="number" name="trailers_{{ day.id }}" value="{{ day.trailers_count }}" min="0"></td>
+                    <td><input type="number" name="trailers_with_coffee_{{ day.id }}" value="{{ day.trailers_with_coffee }}" min="0"></td>
+                    <td><input type="checkbox" name="is_bank_holiday_{{ day.id }}" {% if day.is_bank_holiday %}checked{% endif %}></td>
+                    <td><input type="checkbox" name="has_coffee_machine_{{ day.id }}" {% if day.has_coffee_machine %}checked{% endif %}></td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td colspan="7">No data available</td></tr>
+            {% endif %}
+        </tbody>
+        
+    </table>
+    <button type="submit">Submit</button>
+</form>
+
+<h3>Totals</h3>
+<ul>
+    <li>Total Coffee: {{ total_coffee }}%</li>
+    <li>Total Milkshake: {{ total_mlsh }}%</li>
+    <li>Total 23%: {{ total_23 }}</li>
+</ul>
+{% endblock %}

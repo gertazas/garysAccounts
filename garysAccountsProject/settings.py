@@ -30,10 +30,15 @@ SECRET_KEY = 'django-insecure-k%ly!lnny(fmia=_d6z@vr2n_d!s)1y=#@&+jg99rnydwd+tu7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['8013-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io']
+ALLOWED_HOSTS = ['8000-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io']
 
 CSRF_TRUSTED_ORIGINS = [
     "https://8013-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.gitpod.io",  # Allow all Gitpod workspaces
+    "https://your-custom-domain.com"  # Add any custom domain you use
 ]
 
 

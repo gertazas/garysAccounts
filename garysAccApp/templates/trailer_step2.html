@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Step 2 - percentage{% endblock %}
+
+{% block content %}
+
+<form method="post">
+    {% csrf_token %}
+    {% elif step == 2 %}
+    <table>
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Trailer #</th>
+                <th>Coffee %</th>
+                <th>Milkshake %</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% load custom_filters %}
+            {% for day, count in trailer_counts.items %}
+            {% for i in count|times %}
+                <tr>
+                    <td>{{ day }}</td>
+                    <td>Trailer {{ i }}</td>
+                    <td><input type="number" name="coffee_{{ day }}_{{ i }}" step="0.1" min="0" max="100" required></td>
+                    <td><input type="number" name="milkshake_{{ day }}_{{ i }}" step="0.1" min="0" max="100" required></td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+    <button type="submit">Next</button>
+</form>
+
+<h1>Step 2: Enter Coffee % and Milkshake %</h1>
+<form method="post">
+    {% csrf_token %}
+    <table>
+        <thead>
+            <tr>
+                <th>Trailer</th>
+                <th>Coffee %</th>
+                <th>Milkshake %</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in trailer_range %}
+            <tr>
+                <td>Trailer {{ i }}</td>
+                <td><input type="number" name="coffee_{{ i }}" step="0.1" min="0" max="100" required></td>
+                <td><input type="number" name="milkshake_{{ i }}" step="0.1" min="0" max="100" required></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        
+    </table>
+    <button type="submit">Submit</button>
+</form>
+
+{% endblock %}

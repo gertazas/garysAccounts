@@ -1,6 +1,48 @@
 from django.shortcuts import render, redirect
 from .models import TrailerSelection, WorkDay
 
+
+# Main Trailer Selection
+def trailer_selection(request):
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    
+    # Step 1: Ask for the number of trailers
+    if "trailer_counts" not in request.session:
+        step = 1  # First step
+        if request.method == "POST":
+            trailer_counts = {day: int(request.POST.get(f"trailers_{day}", 0)) for day in days}
+            request.session["trailer_counts"] = trailer_counts  # Store in session
+            return redirect("trailer_selection")  # Refresh for Step 2
+    
+    # Step 2: Enter Coffee & Milkshake % for Each Trailer
+    else:
+        step = 2
+        trailer_counts = request.session["trailer_counts"]
+        if request.method == "POST":
+            coffee_data = {}
+            milkshake_data = {}
+
+            for day, count in trailer_counts.items():
+                coffee_data[day] = []
+                milkshake_data[day] = []
+                
+                for i in range(1, count + 1):
+                    coffee = request.POST.get(f"coffee_{day}_{i}", "0")
+                    milkshake = request.POST.get(f"milkshake_{day}_{i}", "0")
+                    coffee_data[day].append(float(coffee))
+                    milkshake_data[day].append(float(milkshake))
+
+            request.session["coffee_data"] = coffee_data
+            request.session["milkshake_data"] = milkshake_data
+            return redirect("trailer_summary")  # Move to summary step
+
+    return render(request, "trailer_selection.html", {
+        "days": days,
+        "trailer_counts": request.session.get("trailer_counts", {}),
+        "step": step
+    })
+
+
 # Step 1: Ask for the number of trailers per day
 def trailer_step1(request):
     workdays = WorkDay.objects.all()  # Get all available workdays
@@ -59,42 +101,3 @@ def trailer_summary(request):
         "total_milkshake": total_milkshake
     })
 
-# Main Trailer Selection
-def trailer_selection(request):
-    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-    
-    # Step 1: Ask for the number of trailers
-    if "trailer_counts" not in request.session:
-        step = 1  # First step
-        if request.method == "POST":
-            trailer_counts = {day: int(request.POST.get(f"trailers_{day}", 0)) for day in days}
-            request.session["trailer_counts"] = trailer_counts  # Store in session
-            return redirect("trailer_selection")  # Refresh for Step 2
-    
-    # Step 2: Enter Coffee & Milkshake % for Each Trailer
-    else:
-        step = 2
-        trailer_counts = request.session["trailer_counts"]
-        if request.method == "POST":
-            coffee_data = {}
-            milkshake_data = {}
-
-            for day, count in trailer_counts.items():
-                coffee_data[day] = []
-                milkshake_data[day] = []
-                
-                for i in range(1, count + 1):
-                    coffee = request.POST.get(f"coffee_{day}_{i}", "0")
-                    milkshake = request.POST.get(f"milkshake_{day}_{i}", "0")
-                    coffee_data[day].append(float(coffee))
-                    milkshake_data[day].append(float(milkshake))
-
-            request.session["coffee_data"] = coffee_data
-            request.session["milkshake_data"] = milkshake_data
-            return redirect("trailer_summary")  # Move to summary step
-
-    return render(request, "trailer_selection.html", {
-        "days": days,
-        "trailer_counts": request.session.get("trailer_counts", {}),
-        "step": step
-    })
