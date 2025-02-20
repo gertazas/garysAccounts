@@ -3,18 +3,72 @@
 {% block title %}Step 3 - Summary{% endblock %}
 
 {% block content %}
+
+<h1>Trailer Selection</h1>
+<h1>Step 3: Summary</h1>
+{% load custom_filters %}
+{% if coffee_data and milkshake_data %}
+    <p style="color: green;"><strong>Step 2 completed! Here is the summary.</strong></p>
+{% else %}
+    <p style="color: red;"><strong>Please complete Step 2 first.</strong></p>
+{% endif %}
+
+<table style="opacity: {% if coffee_data and milkshake_data %}1{% else %}0.5{% endif %};">
+    <thead>
+        <tr>
+            <th>Day</th>
+            <th>Trailer #</th>
+            <th>Coffee %</th>
+            <th>Milkshake %</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for day, coffee_list in coffee_data.items %}
+        {% for i in coffee_list|length|times %}
+        {% load custom_filters %}
+            <tr>
+                <td>{{ day }}</td>
+                <td>Trailer {{ i }}</td>
+                <td>{{ coffee_list|default_if_none:"0" }}</td>
+                <td>{{ milkshake_data|get_item:day|default_if_none:"0" }}</td>
+            </tr>
+        {% endfor %}
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Total Coffee: {{ total_coffee }}%</h2>
+<h2>Total Milkshake: {{ total_milkshake }}%</h2>
+
+<!-- Reset & Start Over Button -->
+<form method="post" action="{% url 'trailer_selection' %}">
+    {% csrf_token %}
+    <button type="submit" name="reset" style="background-color: rgb(151, 44, 44); color: white; border: none; padding: 10px 15px; cursor: pointer;">
+        Reset & Start Over
+    </button>
+</form>
+
+{% if not coffee_data or not milkshake_data %}
+    <script>
+        setTimeout(() => {
+            window.location.href = "{% url 'trailer_step2' %}"; // Redirect to Step 2
+        }, 5000);  // Redirect after 5 seconds
+    </script>
+{% endif %}
+
+{% endblock %}
+
+
+<!--
 <form method="post">
     {% csrf_token %}
     <table>
         <thead>
             <tr>
                 <th>Day</th>
+                <th>Trailers</th>
                 <th>Coffee %</th>
                 <th>Milkshake %</th>
-                <th>Trailers</th>
-                <th>Trailers with Coffee</th>
-                <th>Bank Holiday?</th>
-                <th>Has Coffee Machine?</th>
             </tr>
         </thead>
         <tbody>
@@ -22,12 +76,9 @@
                 {% for day in days %}
                 <tr>
                     <td>{{ day.day }}</td>
+                    <td><input type="number" name="trailers_{{ day.id }}" value="{{ day.trailers_count }}" min="0"></td>
                     <td><input type="number" name="coffee_{{ day.id }}" value="{{ day.coffee_percentage }}" step="0.1" min="0" max="100"></td>
                     <td><input type="number" name="milkshake_{{ day.id }}" value="{{ day.milkshake_percentage }}" step="0.1" min="0" max="100"></td>
-                    <td><input type="number" name="trailers_{{ day.id }}" value="{{ day.trailers_count }}" min="0"></td>
-                    <td><input type="number" name="trailers_with_coffee_{{ day.id }}" value="{{ day.trailers_with_coffee }}" min="0"></td>
-                    <td><input type="checkbox" name="is_bank_holiday_{{ day.id }}" {% if day.is_bank_holiday %}checked{% endif %}></td>
-                    <td><input type="checkbox" name="has_coffee_machine_{{ day.id }}" {% if day.has_coffee_machine %}checked{% endif %}></td>
                 </tr>
                 {% endfor %}
             {% else %}
@@ -45,4 +96,4 @@
     <li>Total Milkshake: {{ total_mlsh }}%</li>
     <li>Total 23%: {{ total_23 }}</li>
 </ul>
-{% endblock %}
+-->

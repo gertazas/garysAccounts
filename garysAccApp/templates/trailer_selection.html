@@ -1,4 +1,10 @@
+{% extends "base.html" %}
 
+{% block title %}Step 1 - Enter Trailer Count{% endblock %}
+
+{% block content %}
+    
+<body>
 
     <form method="post" class="mx-auto p-5 m-5">
         {% csrf_token %}
@@ -22,4 +28,4 @@
         <input type="checkbox" name="is_bank_holiday"><br>
         <button type="submit">Next</button>
     </form>
-
+{% endblock %}

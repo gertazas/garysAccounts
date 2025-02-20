@@ -4,9 +4,7 @@ register = template.Library()
 
 @register.filter
 def times(number):
-    """Returns a range object for iteration in templates."""
-    return range(int(number))
-
+    return range(1, number + 1)  # Returns a list of numbers from 1 to `number`
 
 @register.filter
 def get_item(dictionary, key):
