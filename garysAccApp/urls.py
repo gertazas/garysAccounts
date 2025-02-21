@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import trailer_selection, trailer_step2, trailer_summary, upload_bank
+from .views_upload import upload_bank 
 
 urlpatterns = [
     path("", trailer_selection, name="trailer_selection"),

@@ -9,6 +9,8 @@ import os
 from django.shortcuts import render
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
+from .views_upload import upload_bank  # Import upload_bank from views_upload.py
+
 
 
 # Step 1: Select number of trailers
@@ -118,20 +120,3 @@ def trailer_summary(request):
         "milkshake_data": milkshake_data
     })
 
-
-def upload_bank(request):
-    extracted_text = ""
-    
-    if request.method == "POST" and request.FILES.get("pdf_file"):
-        pdf_file = request.FILES["pdf_file"]
-        fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "uploads"))
-        filename = fs.save(pdf_file.name, pdf_file)
-        file_path = fs.path(filename)
-
-        # Extract text from PDF
-        with fitz.open(file_path) as doc:
-            extracted_text = "\n".join([page.get_text() for page in doc])
-
-        # (Optional) Process extracted text here before sending to Google Sheets
-
-    return render(request, "upload_bank.html", {"extracted_text": extracted_text})

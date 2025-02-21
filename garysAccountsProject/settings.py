@@ -30,10 +30,19 @@ SECRET_KEY = 'django-insecure-k%ly!lnny(fmia=_d6z@vr2n_d!s)1y=#@&+jg99rnydwd+tu7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['8006-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io']
+ALLOWED_HOSTS = [   '8000-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io',
+                    '8001-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io',
+                    '8002-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io',
+                    '8003-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io',
+                    '8004-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io'
+                ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://8006-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io",
+    "https://8000-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io",
+    "https://8001-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io",
+    "https://8002-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io",
+    "https://8003-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io",
+    "https://8004-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -166,3 +175,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_AGE = 86400  # 1 day
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+
+# settings.py
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
