@@ -4,6 +4,11 @@ from django.db import transaction
 from django.contrib import messages
 from django.utils.safestring import mark_safe
 import time
+import fitz  # PyMuPDF for PDF processing
+import os
+from django.shortcuts import render
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
 
 
 # Step 1: Select number of trailers
@@ -115,5 +120,18 @@ def trailer_summary(request):
 
 
 def upload_bank(request):
+    extracted_text = ""
+    
+    if request.method == "POST" and request.FILES.get("pdf_file"):
+        pdf_file = request.FILES["pdf_file"]
+        fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, "uploads"))
+        filename = fs.save(pdf_file.name, pdf_file)
+        file_path = fs.path(filename)
 
-    return render(request, "upload_bank.html")
+        # Extract text from PDF
+        with fitz.open(file_path) as doc:
+            extracted_text = "\n".join([page.get_text() for page in doc])
+
+        # (Optional) Process extracted text here before sending to Google Sheets
+
+    return render(request, "upload_bank.html", {"extracted_text": extracted_text})

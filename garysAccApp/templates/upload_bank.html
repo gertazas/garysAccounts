@@ -3,11 +3,20 @@
 {% block title %}Upload bank statement{% endblock %}
 
 {% block content %}
-    
-<body>
-    <h1>Upload bank statement</h1>
-</body>
 
+<body>
+    <h2>Upload Bank Statement (PDF)</h2>
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="pdf_file" accept="application/pdf" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    {% if extracted_text %}
+        <h3>Extracted Data:</h3>
+        <textarea rows="10" cols="80">{{ extracted_text }}</textarea>
+    {% endif %}
+</body>
     
     
 {% endblock %}
