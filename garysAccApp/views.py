@@ -1,5 +1,10 @@
 from django.shortcuts import render, redirect
 from .models import TrailerSelection, WorkDay
+from django.db import transaction
+from django.contrib import messages
+from django.utils.safestring import mark_safe
+import time
+
 
 # Step 1: Select number of trailers
 def trailer_selection(request):
@@ -19,9 +24,6 @@ def trailer_selection(request):
 
 
 # Step 2: Enter Coffee & Milkshake Percentages
-from django.utils.safestring import mark_safe
-import time
-
 def trailer_step2(request):
     trailer_counts = request.session.get("trailer_counts", {})
 
@@ -61,23 +63,57 @@ def trailer_step2(request):
         "message": ""
     })
 
-
 def trailer_summary(request):
-    trailer_counts = request.session.get("trailer_counts", {})
-    
-    if not trailer_counts:
-        return redirect("trailer_step2")  # Go back if no trailer data
+    workdays = WorkDay.objects.all()
 
+    # Retrieve session data
+    trailer_counts = request.session.get("trailer_counts", {})
     coffee_data = request.session.get("coffee_data", {})
     milkshake_data = request.session.get("milkshake_data", {})
 
-    total_coffee = sum(sum(values) for values in coffee_data.values()) if coffee_data else 0
-    total_milkshake = sum(sum(values) for values in milkshake_data.values()) if milkshake_data else 0
+    if "reset" in request.GET:
+        request.session.pop("trailer_counts", None)
+        request.session.pop("coffee_data", None)
+        request.session.pop("milkshake_data", None)
+        request.session.modified = True  # Ensure session updates
+        return redirect("trailer_selection")  # Redirect back to Step 1
+
+
+    if request.method == "POST":
+        try:
+            with transaction.atomic():
+                for workday in workdays:
+                    coffee = request.POST.get(f"coffee_{workday.day}", 0)
+                    milkshake = request.POST.get(f"milkshake_{workday.day}", 0)
+                    trailers_count = request.POST.get(f"trailers_{workday.day}", 0)
+                    trailers_with_coffee = request.POST.get(f"trailers_coffee_{workday.day}", 0)
+
+                    # Ensure fetched values are valid before saving
+                    trailer_selection, created = TrailerSelection.objects.get_or_create(day=workday)
+                    trailer_selection.coffee_percentage = float(coffee)
+                    trailer_selection.milkshake_percentage = float(milkshake)
+                    trailer_selection.trailers_count = int(trailers_count)
+                    trailer_selection.trailers_with_coffee = int(trailers_with_coffee)
+                    trailer_selection.save()
+
+            messages.success(request, "Data saved successfully!")
+
+            return render(request, "upload_bank.html", {
+                "trailer_counts": trailer_counts,
+                "coffee_data": coffee_data,
+                "milkshake_data": milkshake_data
+            })  
+        except Exception as e:
+            messages.error(request, f"Error saving data: {e}")
 
     return render(request, "trailer_summary.html", {
-        "trailer_counts": trailer_counts,
-        "coffee_data": coffee_data,
-        "milkshake_data": milkshake_data,
-        "total_coffee": total_coffee,
-        "total_milkshake": total_milkshake
+        "workdays": workdays,
+        "trailer_counts": trailer_counts, 
+        "coffee_data": coffee_data, 
+        "milkshake_data": milkshake_data
     })
+
+
+def upload_bank(request):
+
+    return render(request, "upload_bank.html")

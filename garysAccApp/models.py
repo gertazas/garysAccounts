@@ -15,7 +15,7 @@ class WorkDay(models.Model):
         return self.get_day_display()
 
 class TrailerSelection(models.Model):
-    day = models.ForeignKey(WorkDay, on_delete=models.CASCADE, unique=True)  # Link to WorkDay
+    day = models.OneToOneField(WorkDay, on_delete=models.CASCADE)  # Ensure one record per WorkDay
     coffee_percentage = models.FloatField(default=0.0)
     milkshake_percentage = models.FloatField(default=0.0)
     trailers_count = models.IntegerField(default=0)
@@ -25,4 +25,3 @@ class TrailerSelection(models.Model):
 
     def __str__(self):
         return f"{self.day}: {self.coffee_percentage}% coffee, {self.milkshake_percentage}% milkshake"
-

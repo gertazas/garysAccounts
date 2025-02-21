@@ -30,10 +30,10 @@ SECRET_KEY = 'django-insecure-k%ly!lnny(fmia=_d6z@vr2n_d!s)1y=#@&+jg99rnydwd+tu7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['8000-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io']
+ALLOWED_HOSTS = ['8006-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io']
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://8000-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io",
+    "https://8006-gertazas-garysaccounts-n46yntnbblt.ws-eu117.gitpod.io",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -153,3 +153,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # # Activate Django-Heroku
 # django_heroku.settings(locals())
+# Store session data in the database
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
+# Ensure the session cookie is not deleted
+SESSION_COOKIE_AGE = 86400  # 1 day
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
