@@ -1,20 +1,27 @@
+# tasks:
+#   - init: |
+#       # Ensure SSH agent is running
+#       eval $(ssh-agent -s)
+
+#       # Add your SSH private key to the agent
+#       mkdir -p ~/.ssh
+#       echo "Identity added: /home/gitpod/.ssh/id_rsa (gretazarazas@gmail.com)" > ~/.ssh/id_rsa
+#       chmod 600 ~/.ssh/id_rsa
+
+#       # Add your GitHub public key
+#       echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC0DUNwQHri+hTI6AFJNqMKL7f5eZwa/jSDGaJFOPuOVQS9FEtV9tvX6hDMgTbxplwL6RHpkBlJC444HkbDWCURcTEAw3yIPjHU/slyUUhgwDUoB1L3qEhH6dGbj/LCe2QhSxII5L1eJ4PAqRMqnCVWALID6MPQJqlKk5Ksda83fzodRso+E/gDj8UevJjSYWzAWXkRzt5lFhjiLoc/EMvmbKT9AgzS7xiHYCUrg85slxFXzhWNc25Tqx04dZja1J9gq4uOzB68XXc+vyERIQ9TQqbIH1P8yrWnx5mrAq4eDXfljfhziGvTz2O6ptLmco2Ip5TccSQvLH9tCyOvWeWLgf+pSUDIeHLJIh3daKfYlQPPPuq8kZvQipLOhKztIZ3nZHfbHpKx7TCXmRXV7fw4nlhAkxMXWNJihrQvu1SSQO/Oh5IPXRKKD3afsKFwAPCNLtFUox2v62HzG8P6EZg/JwHuj55tdOSNvi5Z8uxuvpdv+FebCooKcO8bY2CVmD1R4teqvIEOMY/VQevYXzXcDJw9MVRwx0jMiTEkGyfjmrAKdgU0F8Kh5I20CozIK5G8+0eK6CI+/4e4mbAfhNDx0r+BLFP/5h/QRQ12XnvitUDjKaUIVsTN8XBJ7mqDtQgIPbyd0NKZW0LPpI0CnpLDbbPx97kyK9OEBB1LNuElVQ== gretazarazas@gmail.com" > ~/.ssh/id_rsa.pub
+#       chmod 644 ~/.ssh/id_rsa.pub
+
+#       # Ensure GitHub's SSH server is known
+#       ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+#   - command: |
+#       # This command will run your usual workspace start-up commands, e.g., pip install
+#       echo "Gitpod setup complete"
 tasks:
-  - init: |
-      # Ensure SSH agent is running
-      eval $(ssh-agent -s)
-
-      # Add your SSH private key to the agent
+  - before: |
       mkdir -p ~/.ssh
-      echo "Identity added: /home/gitpod/.ssh/id_rsa (gretazarazas@gmail.com)" > ~/.ssh/id_rsa
+      echo -e "Host github.com\n  User git\n  IdentityFile ~/.ssh/id_rsa\n" > ~/.ssh/config
+      chmod 700 ~/.ssh
       chmod 600 ~/.ssh/id_rsa
-
-      # Add your GitHub public key
-      echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC0DUNwQHri+hTI6AFJNqMKL7f5eZwa/jSDGaJFOPuOVQS9FEtV9tvX6hDMgTbxplwL6RHpkBlJC444HkbDWCURcTEAw3yIPjHU/slyUUhgwDUoB1L3qEhH6dGbj/LCe2QhSxII5L1eJ4PAqRMqnCVWALID6MPQJqlKk5Ksda83fzodRso+E/gDj8UevJjSYWzAWXkRzt5lFhjiLoc/EMvmbKT9AgzS7xiHYCUrg85slxFXzhWNc25Tqx04dZja1J9gq4uOzB68XXc+vyERIQ9TQqbIH1P8yrWnx5mrAq4eDXfljfhziGvTz2O6ptLmco2Ip5TccSQvLH9tCyOvWeWLgf+pSUDIeHLJIh3daKfYlQPPPuq8kZvQipLOhKztIZ3nZHfbHpKx7TCXmRXV7fw4nlhAkxMXWNJihrQvu1SSQO/Oh5IPXRKKD3afsKFwAPCNLtFUox2v62HzG8P6EZg/JwHuj55tdOSNvi5Z8uxuvpdv+FebCooKcO8bY2CVmD1R4teqvIEOMY/VQevYXzXcDJw9MVRwx0jMiTEkGyfjmrAKdgU0F8Kh5I20CozIK5G8+0eK6CI+/4e4mbAfhNDx0r+BLFP/5h/QRQ12XnvitUDjKaUIVsTN8XBJ7mqDtQgIPbyd0NKZW0LPpI0CnpLDbbPx97kyK9OEBB1LNuElVQ== gretazarazas@gmail.com" > ~/.ssh/id_rsa.pub
-      chmod 644 ~/.ssh/id_rsa.pub
-
-      # Ensure GitHub's SSH server is known
-      ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-  - command: |
-      # This command will run your usual workspace start-up commands, e.g., pip install
-      echo "Gitpod setup complete"
+      ssh-add ~/.ssh/id_rsa
