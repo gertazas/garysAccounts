@@ -6,11 +6,12 @@
 
 <body>
     <h2>Upload Bank Statement (PDF)</h2>
-    <form method="POST" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <input type="file" name="pdf_file">
+        <input type="file" name="bank_statement" required>
         <button type="submit">Upload</button>
     </form>
+    
     
     {% if extracted_text %}
         <h3>Extracted Data:</h3>

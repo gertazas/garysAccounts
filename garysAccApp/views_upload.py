@@ -1,45 +1,16 @@
 import os
+import re
 import pdfplumber
-import pytesseract
-from pdf2image import convert_from_path
-from PIL import Image
-from django.shortcuts import render, redirect
-import pandas as pd
-from django.shortcuts import render
-from django.core.files.storage import default_storage
 import gspread
 from datetime import datetime
-from oauth2client.service_account import ServiceAccountCredentials
+from django.shortcuts import render, redirect
+from django.core.files.storage import default_storage
 from google.oauth2.service_account import Credentials
-from google.auth.transport.requests import Request
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
+from django.shortcuts import render
+from django.conf import settings
 
 
-
-def upload_bank(request):
-    if request.method == "POST" and request.FILES.get("bank_statement"):
-        # Save uploaded file
-        uploaded_file = request.FILES["bank_statement"]
-        file_path = f"media/uploads/{uploaded_file.name}"
-    
-        with default_storage.open(file_path, "wb+") as destination:
-            for chunk in uploaded_file.chunks():
-                destination.write(chunk)
-
-        print(f"File saved at: {file_path}")
-
-        # Extract payments & dates
-        extracted_payments = extract_payments(file_path)
-
-        # Save payments in the correct Excel format
-        save_to_spreadsheet(extracted_payments, file_path)
-
-        return render(request, "upload_bank.html", {"message": "Processing complete!"})
-
-    return render(request, "upload_bank.html")
-
-
+# Google Sheets Setup
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive.file",
@@ -48,57 +19,127 @@ SCOPE = [
 
 SPREADSHEET_ID = '1MrGvUcus3F8fyGlqVvWYB-udybH0qNlq5JLQY2g_gMs'
 
-# Google Sheets Setup (re-use authentication from views.py)
-creds = ServiceAccountCredentials.from_json_keyfile_name("/workspace/garysAccounts/credentials.json", SCOPE)
-client = gspread.authorize(creds)
-spreadsheet = client.open_by_key(SPREADSHEET_ID)
-# Get the first worksheet in the spreadsheet
-worksheet = spreadsheet.get_worksheet(0)
-
-# Open Google Sheet
-SHEET_NAME = "Gary_Murphy"  # Change this to your sheet's name
-sheet = client.open(SHEET_NAME).sheet1  
-
-# Define PDF directory
-pdf_folder = "/workspace/garysAccounts/media/uploads"
-
-# Find the latest uploaded PDF
-pdf_files = sorted(
-    [f for f in os.listdir(pdf_folder) if f.endswith(".pdf")],
-    key=lambda f: os.path.getctime(os.path.join(pdf_folder, f)),
-    reverse=True
+creds = Credentials.from_service_account_file(
+    "/workspace/garysAccounts/credentials.json", scopes=SCOPE
 )
+client = gspread.authorize(creds)
+sheet = client.open_by_key(SPREADSHEET_ID).sheet1
 
-if not pdf_files:
-    print("No PDF files found.")
-else:
-    pdf_file = os.path.join(pdf_folder, pdf_files[0])  
-    print(f"Processing PDF: {pdf_file}")  
+print("Google Sheets connection successful!")
 
+
+def upload_bank(request):
+    if request.method == "POST":
+        uploaded_file = request.FILES.get("bank_statement")
+        if not uploaded_file:
+            return render(request, "upload_bank.html", {"error": "No file uploaded!"})
+
+        upload_dir = os.path.join(settings.MEDIA_ROOT, "uploads")
+        os.makedirs(upload_dir, exist_ok=True)  # Ensure directory exists
+
+        file_path = os.path.join(upload_dir, uploaded_file.name)
+
+        with default_storage.open(file_path, "wb+") as destination:
+            for chunk in uploaded_file.chunks():
+                destination.write(chunk)
+
+        print(f"File saved at: {file_path}")
+
+        extracted_payments = extract_payments(file_path)
+        update_google_sheets(extracted_payments)
+
+        return render(request, "upload_bank.html", {"message": "Processing complete!"})
+
+    return render(request, "upload_bank.html")
+
+
+# Function to get the latest uploaded PDF file
+def get_latest_pdf():
+    upload_dir = "media/uploads/"
+    pdf_files = sorted(
+        [f for f in os.listdir(upload_dir) if f.endswith(".pdf")],
+        key=lambda f: os.path.getctime(os.path.join(upload_dir, f)),
+        reverse=True
+    )
+    return os.path.join(upload_dir, pdf_files[0]) if pdf_files else None
+
+
+# Function to parse dates correctly
+def parse_date(date_str):
+    try:
+        return datetime.strptime(date_str, "%d %b %Y").date() if date_str else None
+    except ValueError:
+        return None
+
+
+# Function to extract payments from a PDF
+def extract_payments(pdf_path):
     extracted_payments = []
-
-    with pdfplumber.open(pdf_file) as pdf:
+    with pdfplumber.open(pdf_path) as pdf:
         for page in pdf.pages:
-            table = page.extract_table()
-            if table:
-                for row in table[1:]:  # Skip header row
-                    date_str = row[0].strip()
-                    payments_in = row[3].strip() if row[3] else "0"
+            text = page.extract_text()
+            if text:
+                lines = text.split("\n")
+                for line in lines:
+                    match = re.search(r"(\d{2} \w{3} \d{4})\s+.*?\s+([\d,]+\.\d{2})", line)
+                    if match:
+                        date_str = match.group(1)
+                        amount_str = match.group(2).replace(",", "")
+                        extracted_payments.append((date_str, float(amount_str)))
 
-                    try:
-                        date_obj = datetime.strptime(date_str, "%d/%m/%Y").date()
-                        extracted_payments.append((date_obj, payments_in))
-                    except ValueError:
-                        print(f"Skipping invalid date: {date_str}")
+    print("Extracted Payments:", extracted_payments)
+    return extracted_payments
 
-    # Load existing Google Sheets data
-    dates_row = sheet.row_values(2)  # Read the row with date headers
-    dates_dict = {datetime.strptime(d, "%d/%m/%Y").date(): idx for idx, d in enumerate(dates_row, start=10)}
 
-    # Insert payments into the correct column
-    for date, payment in extracted_payments:
-        if date in dates_dict:
-            col_index = dates_dict[date] + 1  # Convert to 1-based index for Google Sheets
-            sheet.update_cell(3, col_index, payment)  # Insert payment in row 3 under correct date
+from datetime import datetime
+from collections import defaultdict
 
-    print("Payments successfully updated in Google Sheets!")
+def update_google_sheets(extracted_payments):
+    dates_row = sheet.row_values(2)  # Fetch header row with dates
+
+    # Detect and clean up duplicate/non-date values
+    date_counts = defaultdict(int)
+    unique_dates = []
+    
+    for cell in dates_row:
+        cell = cell.strip()  # Remove extra spaces
+        try:
+            parsed_date = datetime.strptime(cell, "%Y-%m-%d").date()  # Convert to date object
+            date_counts[parsed_date] += 1
+            unique_dates.append(cell)
+        except ValueError:
+            continue  # Skip invalid date values (e.g., '€0.00')
+
+    # Identify duplicate dates
+    duplicates = {d for d, count in date_counts.items() if count > 1}
+    if duplicates:
+        print(f"⚠ Warning: Duplicate dates found in Google Sheets: {duplicates}")
+        return  # Stop execution to prevent errors
+
+    # Map dates to column indexes
+    dates_dict = {datetime.strptime(d, "%Y-%m-%d").date(): idx + 1 for idx, d in enumerate(unique_dates)}
+
+    print("Parsed dates dictionary:", dates_dict)
+
+    # Process extracted payments
+    for date_str, payment in extracted_payments:
+        try:
+            extracted_date = datetime.strptime(date_str, "%d %b %Y").date()  # Convert extracted date
+            if extracted_date in dates_dict:
+                col_index = dates_dict[extracted_date]
+                sheet.update_cell(3, col_index, payment)  # Update row 3 in the correct column
+                print(f"✅ Updated Google Sheets: date={extracted_date}, col_index={col_index}, payment={payment}")
+            else:
+                print(f"⚠ Date {extracted_date} not found in Google Sheets.")
+        except ValueError:
+            print(f"❌ Invalid extracted date format: {date_str}")
+
+    print("✅ Payments successfully updated in Google Sheets!")
+
+
+# Main Execution for Testing
+if __name__ == "__main__":
+    pdf_path = get_latest_pdf()
+    if pdf_path:
+        extracted_payments = extract_payments(pdf_path)
+        update_google_sheets(extracted_payments)
