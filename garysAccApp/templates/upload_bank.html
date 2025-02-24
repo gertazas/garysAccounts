@@ -1,23 +1,48 @@
 {% extends "base.html" %}
 
-{% block title %}Upload bank statement{% endblock %}
+{% block title %}Upload Bank Statement{% endblock %}
 
 {% block content %}
+<div class="container mt-4">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center">Upload Bank Statement (PDF)</h2>
 
-<body>
-    <h2>Upload Bank Statement (PDF)</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <input type="file" name="bank_statement" required>
-        <button type="submit">Upload</button>
-    </form>
-    
-    
-    {% if extracted_text %}
-        <h3>Extracted Data:</h3>
-        <textarea rows="10" cols="80">{{ extracted_text }}</textarea>
-    {% endif %}
-</body>
-    
-    
+        <form method="post" enctype="multipart/form-data" class="text-center">
+            {% csrf_token %}
+            
+            <!-- File Input with Label -->
+            <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
+                <input type="file" name="bank_statement" id="fileInput" class="form-control d-none" required>
+                <label for="fileInput" class="btn btn-primary">Choose File</label>
+                <span id="fileName" class="text-muted">No file chosen</span>
+            </div>
+
+            <!-- Upload Button -->
+            <div>
+                <button type="submit" class="btn btn-success">Upload</button>
+            </div>
+
+            <!-- Success/Error Messages -->
+            {% if message %}
+                <div class="alert alert-success mt-3 text-center">{{ message }}</div>
+            {% elif error %}
+                <div class="alert alert-danger mt-3 text-center">{{ error }}</div>
+            {% endif %}
+        </form>
+
+        {% if extracted_text %}
+            <h3 class="mt-4">Extracted Data:</h3>
+            <textarea rows="10" cols="80" class="form-control">{{ extracted_text }}</textarea>
+        {% endif %}
+    </div>
+</div>
+
+<!-- JavaScript to Update File Name -->
+<script>
+    document.getElementById("fileInput").addEventListener("change", function() {
+        let fileName = this.files.length > 0 ? this.files[0].name : "No file chosen";
+        document.getElementById("fileName").textContent = fileName;
+    });
+</script>
 {% endblock %}
+
