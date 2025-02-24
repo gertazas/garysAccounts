@@ -1,0 +1,16 @@
+Django
+gunicorn
+psycopg2-binary
+dj-database-url
+cloudinary
+django-storages
+django-allauth
+django-crispy-forms
+django-summernote
+whitenoise
+PyMuPDF
+pdfplumber
+gspread
+google-auth
+google-auth-oauthlib
+google-auth-httplib2

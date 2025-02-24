@@ -1,16 +1,15 @@
-image:
-  file: .gitpod.dockerfile
 tasks:
-  - init: . ${GITPOD_REPO_ROOT}/.vscode/init_tasks.sh
-    command: /home/gitpod/.pg_ctl/bin/pg_start > /dev/null
-  - command: . ${GITPOD_REPO_ROOT}/.vscode/uptime.sh &
-vscode:
-  extensions:
-    - ms-python.python
-    - formulahendry.auto-close-tag
-    - eventyret.bootstrap-4-cdn-snippet
-    - hookyqr.beautify
-    - matt-rudge.auto-open-preview-panel
-    - ms-toolsai.jupyter
-    - ms-toolsai.jupyter-keymap
-    - ms-toolsai.jupyter-renderers
+  - init: |
+      python3 -m venv /workspace/.venv
+      source /workspace/.venv/bin/activate
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      pip install psycopg2-binary
+  - command: |
+      source /workspace/.venv/bin/activate
+      /home/gitpod/.pg_ctl/bin/pg_start > /dev/null
+  - command: |
+      source /workspace/.venv/bin/activate
+      python manage.py migrate
+      echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('accountant', 'gretazarazas@gmail.com', 'accountant') if not User.objects.filter(username='accountant').exists() else print('Superuser already exists')" | python manage.py shell
+
