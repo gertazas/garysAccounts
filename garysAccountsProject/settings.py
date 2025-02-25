@@ -35,7 +35,7 @@ ALLOWED_HOSTS = [ "127.0.0.1", "localhost",
                     '8001-gertazas-garysaccounts-n46yntnbblt.ws-eu118.gitpod.io',
                     '8002-gertazas-garysaccounts-n46yntnbblt.ws-eu118.gitpod.io',
                     '8003-gertazas-garysaccounts-n46yntnbblt.ws-eu118.gitpod.io',
-                    '8004-gertazas-garysaccounts-n46yntnbblt.ws-eu118.gitpod.io'
+                    '8006-gertazas-garysaccounts-n46yntnbblt.ws-eu118.gitpod.io'
                 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -43,7 +43,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://8001-gertazas-garysaccounts-n46yntnbblt.ws-eu118.gitpod.io",
     "https://8002-gertazas-garysaccounts-n46yntnbblt.ws-eu118.gitpod.io",
     "https://8003-gertazas-garysaccounts-n46yntnbblt.ws-eu118.gitpod.io",
-    "https://8004-gertazas-garysaccounts-n46yntnbblt.ws-eu118.gitpod.io",
+    "https://8006-gertazas-garysaccounts-n46yntnbblt.ws-eu118.gitpod.io",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
