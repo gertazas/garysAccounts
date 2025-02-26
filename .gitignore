@@ -5,6 +5,7 @@ env.py
 __pycache__/
 *.py[cod]
 node_modules/
-.github/
+.github/*
+!.github.yaml
 cloudinary_python.txt
 credentials.json
