@@ -10,6 +10,11 @@ from django.conf import settings
 from pdf2image import convert_from_path
 import pytesseract
 from collections import defaultdict
+import pytesseract
+
+
+pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"  # Adjust this path if necessary
+
 
 # Google Sheets Setup
 SCOPE = [
