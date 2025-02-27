@@ -3,9 +3,7 @@ from django.contrib import messages
 import gspread
 from google.oauth2.service_account import Credentials
 from datetime import datetime, timedelta
-from .views_upload import upload_bank
-
-
+import time
 
 # Google Sheets Setup
 SCOPE = [
@@ -21,6 +19,7 @@ creds = Credentials.from_service_account_file(
 )
 client = gspread.authorize(creds)
 sheet = client.open_by_key(SPREADSHEET_ID).sheet1  # First sheet
+sheet.format("B:B", {"backgroundColor": {"red": 0.9, "green": 1, "blue": 0.9}})
 
 def views_sheetprint(request):
     if request.method == "POST":
@@ -31,36 +30,63 @@ def views_sheetprint(request):
             messages.error(request, "Both dates must be selected.")
             return redirect("views_sheetprint")
 
-        # Convert to datetime objects
         start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
         end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
 
-        # Validate Monday - Sunday range
-        if start_date.weekday() != 0 or end_date.weekday() != 6:
-            messages.error(request, "Invalid date range. It must be a Monday-Sunday week.")
+        if start_date.weekday() != 0 or end_date.weekday() != 6 or (end_date - start_date).days != 6:
+            messages.error(request, "Invalid date range. It must be a single Monday-Sunday week.")
             return redirect("views_sheetprint")
+        
+        sheet.update_cell(1, 1, f"{start_date.strftime('%d %b %Y')} - {end_date.strftime('%d %b %Y')}")
+        time.sleep(1)
+        sheet.format("A1", {"textFormat": {"bold": True}})
 
-        # ✅ Step 1: Write the date range to Cell (1,1) without extra spaces
-        sheet.update_cell(1, 1, f"{start_date.strftime('%d %b %Y')}-{end_date.strftime('%d %b %Y')}")
+        weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        row = 2
+        trailer_counts = request.session.get("trailer_counts", {})
 
-        # ✅ Step 2: Write each date separately to row 2 (Tuesday-Sunday)
-        date_cells = {
-            10: start_date + timedelta(days=1),  # Tuesday
-            11: start_date + timedelta(days=2),  # Wednesday
-            12: start_date + timedelta(days=3),  # Thursday
-            13: start_date + timedelta(days=4),  # Friday
-            14: start_date + timedelta(days=5),  # Saturday
-            15: start_date + timedelta(days=6),  # Sunday
-        }
+        for day in weekdays:
+            sheet.update_cell(row, 1, day)
+            sheet.format(f"A{row}", {"textFormat": {"bold": True}})
+            time.sleep(1)
 
-        for col, date in date_cells.items():
-            sheet.update_cell(2, col, date.strftime("%Y-%m-%d"))
+            count = trailer_counts.get(day, 0)
 
-        # ✅ Step 3: Write next Monday’s date to row 2, column 18
-        next_monday = end_date + timedelta(days=1)
-        sheet.update_cell(2, 18, next_monday.strftime("%Y-%m-%d"))
+            for i in range(count):
+                sheet.update_cell(row + i, 2, f"Trailer {i + 1}")  # Column B
+                time.sleep(1)
+
+            days_total_row = row + max(count, 1)
+            sheet.update_cell(days_total_row, 1, "Days Total")
+            time.sleep(1)
+
+            # Apply black border under Days Total (columns 1-6)
+            sheet.format(f"A{days_total_row}:F{days_total_row}", {"borders": {"bottom": {"style": "SOLID_THICK"}}})
+
+            # Apply light grey color in columns 4-6 above the black line (same row as Days Total)
+            sheet.format(f"C{days_total_row}:F{days_total_row}", {"backgroundColor": {"red": 0.937, "green": 0.937, "blue": 0.937}})
+
+            row = days_total_row + 1
+
+        # Reset column B (trailers) to white only up to the last "Days Total" row (before Weeks Total)
+        sheet.format(f"B:B", {"backgroundColor": {"red": 1, "green": 1, "blue": 1}})  # White
+
+        # Weeks Total in light green 3 (Google Sheets color)
+        sheet.update_cell(row, 1, "Weeks Total")
+        sheet.format(f"A{row}:B{row}", {"backgroundColor": {"red": 0.851, "green": 0.918, "blue": 0.827}})
+        time.sleep(1)
+        
+        # Cash Load under Weeks Total in light green 2
+        sheet.update_cell(row + 1, 1, "Cash Load")
+        sheet.format(f"A{row + 1}:B{row + 1}", {"backgroundColor": {"red": 0.717, "green": 0.882, "blue": 0.804}})
+        time.sleep(1)
+
+        # Money Down under Cash Load in light green 2
+        sheet.update_cell(row + 2, 1, "Money Down")
+        sheet.format(f"A{row + 2}:B{row + 2}", {"backgroundColor": {"red": 0.717, "green": 0.882, "blue": 0.804}})
+        time.sleep(1)
 
         messages.success(request, "Google Sheet updated successfully!")
         return redirect("upload_bank")
 
-    return render(request, "views_sheetprint.html")
+    return render(request, "views_sheetprint.html", {"trailer_counts": request.session.get("trailer_counts", {})})

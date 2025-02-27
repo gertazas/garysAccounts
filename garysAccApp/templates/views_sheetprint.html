@@ -1,10 +1,12 @@
-{% extends "base.html" %}
+  
+  {% extends "base.html" %}
 
 {% block title %}Update Weekly Schedule{% endblock %}
 
 {% block content %}
 <div class="container">
     <h2>Update Google Sheet for Weekly Schedule</h2>
+    {% load custom_filters %}
 
     <!-- Display Success or Error Messages -->
     {% if messages %}
@@ -17,10 +19,9 @@
         </div>
     {% endif %}
 
-    <!-- Form for User Input -->
-    <form id="dateForm" method="POST">
+    <!-- Form 1: Only Updates Date -->
+    <form id="dateForm" method="POST" action="{% url 'views_sheetprint' %}">
         {% csrf_token %}
-
         <label for="start_date">Start Date (Monday):</label>
         <input type="date" id="start_date" name="start_date" required>
 
@@ -29,11 +30,41 @@
 
         <p id="error_message" style="color: red;"></p>
 
-        <button type="submit">Update Sheet</button>
+        <button type="submit" name="update_date">Update Date</button>
     </form>
 
-    <!-- Debugging Output -->
-    <p id="debug_output"></p>
+    <hr>
+
+    <!-- Trailer Summary -->
+    <h3>Trailer Summary</h3>
+
+    {% if trailer_counts %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Trailers</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for day, count in trailer_counts.items %}
+                <tr>
+                    <td>{{ day }}</td>
+                    <td>{{ count }} trailers</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Form 2: Only Updates Trailer Data -->
+    <form id="updateSheetForm" method="POST" action="{% url 'views_sheetprint' %}">
+        {% csrf_token %}
+        <button type="submit" name="update_sheet">Update Sheet</button>
+    </form>
+
+    {% else %}
+        <p>No trailers found.</p>
+    {% endif %}
 </div>
 
 <script>
@@ -43,35 +74,20 @@
         const startDateInput = document.getElementById("start_date").value;
         const endDateInput = document.getElementById("end_date").value;
         const errorMessage = document.getElementById("error_message");
-        const debugOutput = document.getElementById("debug_output");
 
         if (!startDateInput || !endDateInput) {
             errorMessage.textContent = "Both dates must be selected.";
             return false;
         }
 
-        // Convert string to Date objects (YYYY-MM-DD format)
         const startDate = new Date(startDateInput + "T00:00:00Z");
         const endDate = new Date(endDateInput + "T00:00:00Z");
 
-        const startDay = startDate.getUTCDay();
-        const endDay = endDate.getUTCDay();
-
-        debugOutput.innerHTML = `
-            <strong>Debugging Info:</strong><br>
-            Start Date: ${startDate.toUTCString()} (Weekday: ${startDay})<br>
-            End Date: ${endDate.toUTCString()} (Weekday: ${endDay})<br>
-        `;
-
-        console.log("Start Date:", startDate.toUTCString(), "Weekday:", startDay);
-        console.log("End Date:", endDate.toUTCString(), "Weekday:", endDay);
-
-        // Monday = 1, Sunday = 0
-        if (startDay !== 1) {
+        if (startDate.getUTCDay() !== 1) {
             errorMessage.textContent = "Start date must be a Monday.";
             return false;
         }
-        if (endDay !== 0) {
+        if (endDate.getUTCDay() !== 0) {
             errorMessage.textContent = "End date must be a Sunday.";
             return false;
         }
@@ -81,10 +97,8 @@
         }
 
         errorMessage.textContent = "";
-
-        // ✅ If all checks pass, submit the form
         this.submit();
     });
 </script>
-{% endblock %}
 
+{% endblock %}
