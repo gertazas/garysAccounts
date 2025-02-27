@@ -3,6 +3,9 @@ from django.contrib import messages
 import gspread
 from google.oauth2.service_account import Credentials
 from datetime import datetime, timedelta
+from .views_upload import upload_bank
+
+
 
 # Google Sheets Setup
 SCOPE = [
@@ -37,8 +40,8 @@ def views_sheetprint(request):
             messages.error(request, "Invalid date range. It must be a Monday-Sunday week.")
             return redirect("views_sheetprint")
 
-        # ✅ Step 1: Write the date range to Cell (1,1)
-        sheet.update_cell(1, 1, f"{start_date.strftime('%d %b %Y')} - {end_date.strftime('%d %b %Y')}")
+        # ✅ Step 1: Write the date range to Cell (1,1) without extra spaces
+        sheet.update_cell(1, 1, f"{start_date.strftime('%d %b %Y')}-{end_date.strftime('%d %b %Y')}")
 
         # ✅ Step 2: Write each date separately to row 2 (Tuesday-Sunday)
         date_cells = {
@@ -53,11 +56,11 @@ def views_sheetprint(request):
         for col, date in date_cells.items():
             sheet.update_cell(2, col, date.strftime("%Y-%m-%d"))
 
-        # ✅ Step 3: Write next Monday’s date to row 18, column 18
+        # ✅ Step 3: Write next Monday’s date to row 2, column 18
         next_monday = end_date + timedelta(days=1)
         sheet.update_cell(2, 18, next_monday.strftime("%Y-%m-%d"))
 
         messages.success(request, "Google Sheet updated successfully!")
-        return redirect("views_sheetprint")
+        return redirect("upload_bank")
 
     return render(request, "views_sheetprint.html")

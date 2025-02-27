@@ -9,6 +9,7 @@ from google.oauth2.service_account import Credentials
 from django.conf import settings
 from collections import defaultdict
 
+
 # Google Sheets Setup
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",

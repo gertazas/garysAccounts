@@ -14,16 +14,7 @@
 {% load custom_filters %}
 
 <table style="opacity: {% if trailer_counts %}1{% else %}0.5{% endif %}; border-collapse: collapse; width: 100%;">
-    <thead>
-        <tr>
-            <th>Day</th>
-            <th>Trailer #</th>
-            <th>Coffee %</th>
-            <th>Milkshake %</th>
-            <th>23 %</th>
-        </tr>
-    </thead>
-    <tbody>
+
         {% load custom_filters %}
 
 <table>
@@ -51,7 +42,7 @@
 </table>
 
 <!-- Reset Button -->
-<<form method="post" class='mt-5 pt-5'>
+<form action="{% url 'views_sheetprint' %}" method="get" class='mt-5 pt-5'>
     {% csrf_token %}
     <button type="submit">Next</button>
     <button class='mt-5' type="submit" name="reset" value="1"

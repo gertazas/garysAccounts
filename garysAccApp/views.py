@@ -9,13 +9,13 @@ import os
 from django.shortcuts import render
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
-from .views_upload import upload_bank  # Import upload_bank from views_upload.py
+from .views_sheetprint import views_sheetprint  # Import upload_bank from views_upload.py
 
 
 
 # Step 1: Select number of trailers
 def trailer_selection(request):
-    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     
     # Step 1: Ask for the number of trailers
     if request.method == "POST":
@@ -105,7 +105,7 @@ def trailer_summary(request):
 
             messages.success(request, "Data saved successfully!")
 
-            return render(request, "upload_bank.html", {
+            return render(request, "views_sheetprint", {
                 "trailer_counts": trailer_counts,
                 "coffee_data": coffee_data,
                 "milkshake_data": milkshake_data
