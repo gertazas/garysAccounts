@@ -8,6 +8,7 @@ from django.core.files.storage import default_storage
 from google.oauth2.service_account import Credentials
 from django.conf import settings
 from collections import defaultdict
+from .final_views import final_views
 
 
 # Google Sheets Setup
@@ -46,7 +47,7 @@ def upload_bank(request):
         extracted_payments = extract_payments(file_path)
         if extracted_payments:
             update_google_sheets(extracted_payments)
-            return render(request, "upload_bank.html", {"message": "Upload successful and data processed."})
+            return render(request, "final_views.html", {"message": "Upload successful and data processed."})
         else:
             return render(request, "upload_bank.html", {"error": "No payments found in the file."})
     
