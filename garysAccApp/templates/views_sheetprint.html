@@ -56,12 +56,6 @@
         </tbody>
     </table>
 
-    <!-- Form 2: Only Updates Trailer Data -->
-    <form id="updateSheetForm" method="POST" action="{% url 'views_sheetprint' %}">
-        {% csrf_token %}
-        <button type="submit" name="update_sheet">Update Sheet</button>
-    </form>
-
     {% else %}
         <p>No trailers found.</p>
     {% endif %}

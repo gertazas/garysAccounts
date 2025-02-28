@@ -11,4 +11,3 @@ urlpatterns = [
     path("upload_bank/", upload_bank, name="upload_bank"),
     path("views_sheetprint/", views_sheetprint, name="views_sheetprint"),
 ]
-c

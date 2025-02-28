@@ -41,6 +41,26 @@ def views_sheetprint(request):
         time.sleep(1)
         sheet.format("A1", {"textFormat": {"bold": True}})
 
+        # dates from start to next Monday
+        # Write each date separately to row 2 (Tuesday-Sunday)
+        date_cells = {
+            10: start_date + timedelta(days=1),  # Tuesday
+            11: start_date + timedelta(days=2),  # Wednesday
+            12: start_date + timedelta(days=3),  # Thursday
+            13: start_date + timedelta(days=4),  # Friday
+            14: start_date + timedelta(days=5),  # Saturday
+            15: start_date + timedelta(days=6),  # Sunday
+        }
+
+        for col, date in date_cells.items():
+            sheet.update_cell(2, col, date.strftime("%Y-%m-%d"))
+
+        # Write next Monday’s date to row 2, column 18
+        next_monday = end_date + timedelta(days=1)
+        sheet.update_cell(2, 18, next_monday.strftime("%Y-%m-%d"))
+
+        messages.success(request, "Google Sheet updated successfully!")
+
         weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         row = 2
         trailer_counts = request.session.get("trailer_counts", {})
