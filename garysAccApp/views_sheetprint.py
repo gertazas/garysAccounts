@@ -19,7 +19,6 @@ creds = Credentials.from_service_account_file(
 )
 client = gspread.authorize(creds)
 sheet = client.open_by_key(SPREADSHEET_ID).sheet1  # First sheet
-sheet.format("B:B", {"backgroundColor": {"red": 0.9, "green": 1, "blue": 0.9}})
 
 def views_sheetprint(request):
     if request.method == "POST":
@@ -87,9 +86,6 @@ def views_sheetprint(request):
             sheet.format(f"C{days_total_row}:F{days_total_row}", {"backgroundColor": {"red": 0.937, "green": 0.937, "blue": 0.937}})
 
             row = days_total_row + 1
-
-        # Reset column B (trailers) to white only up to the last "Days Total" row (before Weeks Total)
-        sheet.format(f"B:B", {"backgroundColor": {"red": 1, "green": 1, "blue": 1}})  # White
 
         # Weeks Total in light green 3 (Google Sheets color)
         sheet.update_cell(row, 1, "Weeks Total")

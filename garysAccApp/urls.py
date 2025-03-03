@@ -11,5 +11,5 @@ urlpatterns = [
     path("summary/", trailer_summary, name="trailer_summary"),
     path("upload_bank/", upload_bank, name="upload_bank"),
     path("views_sheetprint/", views_sheetprint, name="views_sheetprint"),
-    path("final_views/", final_views, name="final_views/"),
+    path("final_views/", final_views, name="final_views"),
 ]
