@@ -77,7 +77,7 @@ def update_google_sheets(extracted_payments):
     
     for index, cell in enumerate(dates_row, start=1):
         try:
-            parsed_date = datetime.strptime(cell.strip(), "%Y-%m-%d").date()
+            parsed_date = datetime.strptime(cell.strip(), "%d %b %Y").date()
             date_columns[parsed_date] = index
         except ValueError:
             continue

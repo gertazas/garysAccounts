@@ -48,7 +48,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "https://*.gitpod.io",  # Allow all Gitpod workspaces
-    "https://your-custom-domain.com"  # Add any custom domain you use
+    "http://127.0.0.1:8000/*"  # Add any custom domain you use
 ]
 
 

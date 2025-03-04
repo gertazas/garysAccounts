@@ -29,7 +29,7 @@ def views_sheetprint(request):
             messages.error(request, "Both dates must be selected.")
             return redirect("views_sheetprint")
 
-        start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+        start_date = datetime.strptime(start_date_str, "%d %b %Y")
         end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
 
         if start_date.weekday() != 0 or end_date.weekday() != 6 or (end_date - start_date).days != 6:

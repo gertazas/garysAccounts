@@ -238,7 +238,6 @@ def final_views(request):
 
         if cash_load_row:
             try:
-                time.sleep(60)
                 worksheet.update_cell(cash_load_row - 1, 2, cashtotal)  # Above 'Cash Load'
                 worksheet.update_cell(cash_load_row, 2, total_value)  # 'Cash Load' row
                 worksheet.update_cell(cash_load_row + 1, 2, cashdown)  # Below 'Cash Load'
