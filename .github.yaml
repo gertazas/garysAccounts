@@ -4,10 +4,10 @@ image:
 tasks:
   - init: |
       # Ensure SSH keys exist and are copied
-      mkdir -p /workspace/.ssh
-      ssh-keygen -t ed25519 -f /workspace/.ssh/id_ed25519 -N "" 2>/dev/null || true
-      cp /workspace/.ssh/id_ed25519 ~/.ssh/id_ed25519 2>/dev/null || true
-      cp /workspace/.ssh/id_ed25519.pub ~/.ssh/id_ed25519.pub 2>/dev/null || true
+      mkdir -p /C:\Users\greta\.vscode\.ssh
+      ssh-keygen -t ed25519 -f /C:\Users\greta\.vscode\.ssh/id_ed25519 -N "" 2>/dev/null || true
+      cp /C:\Users\greta\.vscode\.ssh/id_ed25519 ~/.ssh/id_ed25519 2>/dev/null || true
+      cp /C:\Users\greta\.vscode\.ssh/id_ed25519.pub ~/.ssh/id_ed25519.pub 2>/dev/null || true
       chmod 600 ~/.ssh/id_ed25519
       
       # Configure SSH for GitHub
@@ -18,19 +18,19 @@ tasks:
       ssh-add ~/.ssh/id_ed25519
 
       # Set up Python virtual environment
-      python3 -m venv /workspace/.venv
-      source /workspace/.venv/bin/activate
+      python3 -m venv /C:\Users\greta\.vscode\.venv
+      source /C:\Users\greta\.vscode\.venv/bin/activate
       pip install -r requirements.txt
       pip install psycopg2-binary
 
     command: /home/gitpod/.pg_ctl/bin/pg_start > /dev/null
 
   - command: |
-      source /workspace/.venv/bin/activate
+      source /C:\Users\greta\.vscode\.venv/bin/activate
       . ${GITPOD_REPO_ROOT}/.vscode/uptime.sh &
 
   - command: |
-      source /workspace/.venv/bin/activate
+      source /C:\Users\greta\.vscode\.venv/bin/activate
       python manage.py migrate
       echo "
       from django.contrib.auth import get_user_model;

@@ -15,7 +15,7 @@ SPREADSHEET_ID = '1MrGvUcus3F8fyGlqVvWYB-udybH0qNlq5JLQY2g_gMs'
 
 # Authorize Google Sheets
 creds = Credentials.from_service_account_file(
-    "/workspace/garysAccounts/credentials.json", scopes=SCOPE
+    "C:/Users/greta/.vscode/garysAccounts/credentials.json", scopes=SCOPE
 )
 client = gspread.authorize(creds)
 sheet = client.open_by_key(SPREADSHEET_ID).sheet1  # First sheet
