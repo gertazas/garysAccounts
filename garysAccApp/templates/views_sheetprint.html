@@ -8,6 +8,12 @@
     <h2>Update Google Sheet for Weekly Schedule</h2>
     {% load custom_filters %}
 
+    {% if trailer_counts %}
+    <p style="color: green;"><strong>Please fill in the dates below.</strong></p>
+{% else %}
+    <p style="color: red;"><strong>Please complete previuos steps first.</strong></p>
+{% endif %}
+
     <!-- Display Success or Error Messages -->
     {% if messages %}
         <div>

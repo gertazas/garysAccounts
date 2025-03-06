@@ -2,7 +2,30 @@
 {% block title %}Step 6 - Final Counts{% endblock %}
 {% block content %}
 
-<h2>Preparing system for final accounts loads...</h2>
+<h2></h2>
 {% load custom_filters %}
+
+{% if trailer_counts %}
+    <p style="color: green;"><strong>Please fill in the dates below.</strong></p>
+{% else %}
+    <p style="color: red;"><strong>Please complete previuos steps first.</strong></p>
+{% endif %}
+
+<button id="processButton">Process Data</button>
+    <p id="message"></p>
+
+    <script>
+        document.getElementById("processButton").addEventListener("click", function () {
+            fetch("/process_final_views/", {
+                method: "POST",
+                headers: { "X-CSRFToken": "{{ csrf_token }}" },  // Ensure CSRF protection
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("message").innerText = data.message;
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    </script>
 
 {% endblock %}

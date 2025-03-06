@@ -9,6 +9,7 @@ from google.oauth2.service_account import Credentials
 from django.conf import settings
 from collections import defaultdict
 from .final_views import final_views
+from .models import TrailerSelection
 
 
 # Google Sheets Setup

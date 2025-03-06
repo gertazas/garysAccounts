@@ -18,6 +18,10 @@ SCOPE = [
 SPREADSHEET_ID = '1MrGvUcus3F8fyGlqVvWYB-udybH0qNlq5JLQY2g_gMs'
 
 def final_views(request):
+
+    return render(request, "final_views.html", {"message": "Successful page load"})
+    
+def process_final_views(request):
     if getattr(request, "_processed_final_views", False):
         print("Skipping redundant execution.")
         return render(request, "final_views.html", {"message": "Skipped redundant execution."})
@@ -250,13 +254,14 @@ def final_views(request):
                 print(f"Skipping invalid total value at (20, 17): {total_value}")
         else:
             print("Could not find 'Cash Load' in column 1.")
-
-        return render(request, "final_views.html", {"message": "Successful page load"})
     
+        print("Processing complete.")
+        return JsonResponse({"message": "Processing complete", "totals": totals_rows_3_16}) 
+
     except HttpError as e:
         print(f"Google API Error: {str(e)}")
         time.sleep(60)
-        return final_views(request)
+        return process_final_views(request)
     except Exception as e:
         print(f"Unexpected Error: {str(e)}")
         return render(request, "final_views.html", {"message": f"Unexpected Error: {str(e)}"})
