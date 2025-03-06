@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Step 1 - Enter Trailer Count{% endblock %}
+{% block title %}Step 1 - Enter Trailer Counts{% endblock %}
 
 {% block content %}
-<h4 style="color: green;"><strong>Please fill the amount trailers for each day below.</strong></h4>
+<h2>Trailer Counts</h2>
+<h3>Step 1: Enter Trailer Counts</h3>
+{% load custom_filters %}
+<p class='pl-5 ml-5' style="color: green;"><strong>Please fill the amount trailers for each day below.</strong></p>
 <body>
 
-    <form method="post" class="mx-auto p-5 m-5">
+    <form method="post" class="mx-auto pl-5 ml-5">
         {% csrf_token %}
         <table class="mx-auto p-2">
             <thead>

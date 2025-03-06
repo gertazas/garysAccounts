@@ -2,18 +2,21 @@
 {% block title %}Step 6 - Final Counts{% endblock %}
 {% block content %}
 
-<h2></h2>
+<h2>Final step in proceeding accounts</h2>
+<h3>Step 6: Datacheck in google sheets done</h3>
 {% load custom_filters %}
 
-{% if trailer_counts %}
-    <p style="color: green;"><strong>Please fill in the dates below.</strong></p>
+{% if trailer_counts and coffee_data %}
+    <p style="color: green;"><strong>Please check your google sheets for correct data</strong></p>
 {% else %}
     <p style="color: red;"><strong>Please complete previuos steps first.</strong></p>
 {% endif %}
 
-<button id="processButton">Process Data</button>
-    <p id="message"></p>
-
+<div style="opacity: {% if trailer_counts %}1{% else %}0.5{% endif %}; border-collapse: collapse; width: 100%;">
+    <h3>Press the button to proceed</h3>
+    <button id="processButton">Process Data</button>
+        <p id="message"></p>
+</div>
     <script>
         document.getElementById("processButton").addEventListener("click", function () {
             fetch("/process_final_views/", {

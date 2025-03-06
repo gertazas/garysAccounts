@@ -8,6 +8,8 @@ from django.shortcuts import render
 from google.oauth2.service_account import Credentials
 from google.auth.transport.requests import Request
 from googleapiclient.errors import HttpError
+from .models import TrailerSelection
+
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -18,9 +20,13 @@ SCOPE = [
 SPREADSHEET_ID = '1MrGvUcus3F8fyGlqVvWYB-udybH0qNlq5JLQY2g_gMs'
 
 def final_views(request):
+    trailer_counts = request.session.get("trailer_counts", {})
+    coffee_data = request.session.get("coffee_data", {})
+    return render(request, "final_views.html", {"trailer_counts": trailer_counts,
+                                                "coffee_data": coffee_data, 
+                                                "message": "Successful page load"})
 
-    return render(request, "final_views.html", {"message": "Successful page load"})
-    
+
 def process_final_views(request):
     if getattr(request, "_processed_final_views", False):
         print("Skipping redundant execution.")

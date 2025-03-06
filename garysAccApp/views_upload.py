@@ -51,8 +51,12 @@ def upload_bank(request):
             return render(request, "final_views.html", {"message": "Upload successful and data processed."})
         else:
             return render(request, "upload_bank.html", {"error": "No payments found in the file."})
-    
-    return render(request, "upload_bank.html")
+    trailer_counts = request.session.get("trailer_counts", {})
+    coffee_data = request.session.get("coffee_data", {})
+    return render(request, "upload_bank.html", {
+                                "trailer_counts": trailer_counts,
+                                "coffee_data": coffee_data,
+                                })
 
 def extract_payments(pdf_path):
     extracted_payments = []

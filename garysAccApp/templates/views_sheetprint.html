@@ -4,15 +4,18 @@
 {% block title %}step 4 Update Gsheets{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2>Update Google Sheet for Weekly Schedule</h2>
-    {% load custom_filters %}
+<h2>Date Entries</h2>
+<h3>Step 4: Update Google Sheet for Weekly Schedule</h3>
 
-    {% if trailer_counts %}
+{% if trailer_counts and coffee_data %}
     <p style="color: green;"><strong>Please fill in the dates below.</strong></p>
 {% else %}
     <p style="color: red;"><strong>Please complete previuos steps first.</strong></p>
 {% endif %}
+<div class="container" style="opacity: {% if trailer_counts %}1{% else %}0.5{% endif %}; border-collapse: collapse; width: 100%;">
+
+    {% load custom_filters %}
+
 
     <!-- Display Success or Error Messages -->
     {% if messages %}

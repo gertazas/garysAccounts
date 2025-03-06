@@ -25,8 +25,10 @@ client = gspread.authorize(creds)
 sheet = client.open_by_key(SPREADSHEET_ID).sheet1  # First sheet
 
 def views_sheetprint(request):
-
+    
     try:
+        trailer_counts = request.session.get("trailer_counts", {})
+        coffee_data = request.session.get("coffee_data", {})
         if request.method == "POST":
             start_date_str = request.POST.get("start_date")
             end_date_str = request.POST.get("end_date")
@@ -113,9 +115,15 @@ def views_sheetprint(request):
                 messages.success(request, success_message)
 
             messages.success(request, {"message": success_message})
-            return redirect("upload_bank")
+            return redirect("upload_bank", {
+                                "trailer_counts": trailer_counts,
+                                "coffee_data": coffee_data,
+                                })
 
-        return render(request, "views_sheetprint.html", {"trailer_counts": request.session.get("trailer_counts", {})})
+        return render(request, "views_sheetprint.html", {
+                                "trailer_counts": trailer_counts,
+                                "coffee_data": coffee_data,
+                                })
     except HttpError as e:
         print(f"Google API Error: {str(e)}")
         time.sleep(60)

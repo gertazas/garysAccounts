@@ -2,10 +2,10 @@
 {% block title %}Step 3 - Summary{% endblock %}
 {% block content %}
     
-<h1>Trailer Selection</h1>
-<h1>Step 3: Summary</h1>
+<h2>Summary</h2>
+<h3>Step 3: Look over all trailer counts and %</h3>
 
-{% if trailer_counts %}
+{% if trailer_counts and coffee_data %}
     <p style="color: green;"><strong>Step 2 completed! Review the summary below.</strong></p>
 {% else %}
     <p style="color: red;"><strong>Please complete Step 1 and Step 2 first.</strong></p>
@@ -13,11 +13,9 @@
 
 {% load custom_filters %}
 
-<table style="opacity: {% if trailer_counts %}1{% else %}0.5{% endif %}; border-collapse: collapse; width: 100%;">
-
         {% load custom_filters %}
 
-<table>
+<table style="opacity: {% if trailer_counts %}1{% else %}0.5{% endif %}; border-collapse: collapse; width: 100%;">
     <thead>
         <tr>
             <th>Day</th>
